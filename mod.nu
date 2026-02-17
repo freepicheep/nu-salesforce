@@ -25,3 +25,4 @@ export use auth.nu *
 export use query.nu *
 export use sobject.nu *
 export use rest.nu *
+export use util.nu [load-env-file]

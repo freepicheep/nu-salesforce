@@ -204,3 +204,21 @@ export def xml-find-text [xml: record tag_name: string] {
 
     null
 }
+
+# Loads environment variables from a file
+export def --env load-env-file [path?: path = '.env'] {
+    if ($path | path exists) {
+        open -r $path | from kv | load-env
+    } else {
+        error make -u {msg: $'file `($path)` not found'}
+    }
+}
+
+# Parses `KEY=value` text into a record
+export def 'from kv' []: oneof<string, nothing> -> record {
+    default ''
+    | parse '{key}={value}'
+    | update value { from yaml }
+    | transpose -dlr
+    | default -e {}
+}

@@ -46,6 +46,26 @@ sf whoami
 sf logout
 ```
 
+If you store your Salesforce username, password, and security token in a `.env` file, you can use the `load-env-file` function to add those to your environment variables.[^1]
+
+**Your `.env` File**
+```env
+SALESFORCE_USERNAME='user@example.com'
+SALESFORCE_PASSWORD='xxxxxxxx'
+SECURITY_TOKEN='xxxxxxxx'
+```
+
+**In Your Script**
+```nu
+use /path/to/nu-salesforce * 
+
+# load your salesforce credentials from the .env file
+load-env-file
+
+# login to salesforce with your credentials
+sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD --token $env.SECURITY_TOKEN
+```
+
 ## Commands
 
 | Command | Description |
@@ -72,6 +92,7 @@ sf logout
 | `sf tooling` | Call the Tooling API |
 | `sf limits` | Show org API usage limits |
 | `sf describe` | Describe all available SObjects |
+| `load-env-file` | Loads key-value data from a .env file |
 
 ## Learning More
 
@@ -90,3 +111,5 @@ Most of the original code was written with Claude Opus 4.6 using Google's Antigr
 ## License
 
 MIT
+
+[^1]: Thanks to `@pixl_xip` on the nushell Discord for this handy function.
