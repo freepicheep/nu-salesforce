@@ -55,10 +55,11 @@ export def "sf sobject create" [
     object: string # SObject type (e.g. Account, Lead)
     data?: record # Record data to create. Can also be piped in.
 ] {
+    let input = $in
     let sf = $env.SALESFORCE
     let url = $"($sf.base_url)sobjects/($object)/"
 
-    let body = if ($data != null) { $data } else { $in }
+    let body = if ($data != null) { $data } else { $input }
 
     if ($body == null) {
         error make {msg: "No data provided. Pass a record as an argument or pipe it in."}
@@ -75,10 +76,11 @@ export def "sf sobject update" [
     record_id: string # The record ID to update
     data?: record # Fields to update. Can also be piped in.
 ] {
+    let input = $in
     let sf = $env.SALESFORCE
     let url = $"($sf.base_url)sobjects/($object)/($record_id)"
 
-    let body = if ($data != null) { $data } else { $in }
+    let body = if ($data != null) { $data } else { $input }
 
     if ($body == null) {
         error make {msg: "No data provided. Pass a record as an argument or pipe it in."}
@@ -104,10 +106,11 @@ export def "sf sobject upsert" [
     ext_id_value: string # External ID value
     data?: record # Record data. Can also be piped in.
 ] {
+    let input = $in
     let sf = $env.SALESFORCE
     let url = $"($sf.base_url)sobjects/($object)/($ext_id_field)/($ext_id_value)"
 
-    let body = if ($data != null) { $data } else { $in }
+    let body = if ($data != null) { $data } else { $input }
 
     if ($body == null) {
         error make {msg: "No data provided. Pass a record as an argument or pipe it in."}
