@@ -1,6 +1,6 @@
 # SOQL query and SOSL search commands for Salesforce.
 
-use util.nu [ sf-call ]
+use util.nu [ sf-call validate-soql ]
 
 # Run a SOQL query against Salesforce.
 #
@@ -18,6 +18,9 @@ export def "sf query" [
     --raw # Return the raw Salesforce JSON response
     --include-deleted # Include deleted/archived records (queryAll endpoint)
 ] {
+    # basic soql validation before hitting the Salesforce API
+    validate-soql $soql
+
     let sf = $env.SALESFORCE
     let endpoint = if $include_deleted { "queryAll/" } else { "query/" }
     let url = $"($sf.base_url)($endpoint)"
