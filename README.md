@@ -83,6 +83,10 @@ help sf sobject create
 help sf login
 ```
 
+## Disclaimers
+
+Most of the original code was written with Claude Opus 4.6 using Google's Antigravity. I used the excellent [simple-salesforce](https://github.com/simple-salesforce/simple-salesforce) python library to guide the llm on creating this module. I have not fully tested every feature yet and am not responsible for any unexpected behavior or misuse of this module.
+
 ## License
 
 MIT
