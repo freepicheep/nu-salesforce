@@ -18,6 +18,10 @@
 #   # Generic REST
 #   sf rest "limits/"
 #   sf apex "MyEndpoint"
+#
+#   # Bulk API 2.0
+#   [{Name: "Acme"}, {Name: "Globex"}] | sf bulk insert Account
+#   sf bulk query "SELECT Id, Name FROM Account"
 #   sf tooling "query/?q=SELECT+Id+FROM+ApexClass"
 
 # Re-export all public commands from submodules
@@ -25,4 +29,5 @@ export use auth.nu *
 export use query.nu *
 export use sobject.nu *
 export use rest.nu *
-export use util.nu [load-env-file]
+export use bulk.nu *
+export use util.nu [ load-env-file ]
