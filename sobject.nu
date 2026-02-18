@@ -4,9 +4,9 @@
 use util.nu [ sf-call to-sf-datetime ]
 
 # Get a Salesforce record by its ID.
-@example "get an account by ID" { sf sobject get Account 001XXXXXXXXXXXX }
-@example "get a contact with specific fields" { sf sobject get Contact 003XXXXXXXXXXXX --fields "Id,Name,Email" }
-export def "sf sobject get" [
+@example "get an account by ID" { sf get Account 001XXXXXXXXXXXX }
+@example "get a contact with specific fields" { sf get Contact 003XXXXXXXXXXXX --fields "Id,Name,Email" }
+export def "sf get" [
     object: string # SObject type (e.g. Account, Lead, Contact)
     record_id: string # The Salesforce record ID
     --fields: string # Optional comma-separated list of fields to return
@@ -22,8 +22,8 @@ export def "sf sobject get" [
 }
 
 # Get a Salesforce record by a custom (external) ID field.
-@example "get an account by external ID" { sf sobject get-by-custom-id Account My_External_Id__c "EXT-001" }
-export def "sf sobject get-by-custom-id" [
+@example "get an account by external ID" { sf get-by-custom-id Account My_External_Id__c "EXT-001" }
+export def "sf get-by-custom-id" [
     object: string # SObject type
     custom_id_field: string # The external ID field name
     custom_id: string # The external ID value
@@ -37,7 +37,7 @@ export def "sf sobject get-by-custom-id" [
 #
 # Accepts data as a record (from argument or piped input).
 # Returns the creation result with the new record's Id.
-@example "create an account" { sf sobject create Account {Name: "Acme Corp" Industry: "Technology"} } --result "
+@example "create an account" { sf create Account {Name: "Acme Corp" Industry: "Technology"} } --result "
 ╭─────────┬────────────────────╮
 │ id      │ 001Paxxxxxxxxxxxxx │
 │ success │ true               │
@@ -51,7 +51,7 @@ export def "sf sobject get-by-custom-id" [
 │ errors  │ [list 0 items]     │
 ╰─────────┴────────────────────╯
 "
-export def "sf sobject create" [
+export def "sf create" [
     object: string # SObject type (e.g. Account, Lead)
     data?: record # Record data to create. Can also be piped in.
 ] {
@@ -69,9 +69,9 @@ export def "sf sobject create" [
 }
 
 # Update an existing Salesforce record.
-@example "update an account" { sf sobject update Account 001XXXXXXXXXXXX { Name: "Updated Corp" } }
-@example "update an account by piping data" { { Name: "Updated Corp" } | sf sobject update Account 001XXXXXXXXXXXX }
-export def "sf sobject update" [
+@example "update an account" { sf update Account 001XXXXXXXXXXXX {Name: "Updated Corp"} }
+@example "update an account by piping data" { {Name: "Updated Corp"} | sf sobject update Account 001XXXXXXXXXXXX }
+export def "sf update" [
     object: string # SObject type
     record_id: string # The record ID to update
     data?: record # Fields to update. Can also be piped in.
@@ -99,8 +99,8 @@ export def "sf sobject update" [
 #
 # If a record with the given external ID exists, it's updated.
 # If not, a new record is created.
-@example "upsert an account by external ID" { sf sobject upsert Account My_External_Id__c EXT-001 { Name: "Acme" } }
-export def "sf sobject upsert" [
+@example "upsert an account by external ID" { sf upsert Account My_External_Id__c EXT-001 {Name: "Acme"} }
+export def "sf upsert" [
     object: string # SObject type
     ext_id_field: string # External ID field name
     ext_id_value: string # External ID value
@@ -125,8 +125,8 @@ export def "sf sobject upsert" [
 }
 
 # Delete a Salesforce record.
-@example "delete an account" { sf sobject delete Account 001XXXXXXXXXXXX }
-export def "sf sobject delete" [
+@example "delete an account" { sf delete Account 001XXXXXXXXXXXX }
+export def "sf delete" [
     object: string # SObject type
     record_id: string # The record ID to delete
 ] {
@@ -139,9 +139,9 @@ export def "sf sobject delete" [
 }
 
 # Describe an SObject — returns its metadata (fields, relationships, etc).
-@example "describe an account" { sf sobject describe Account }
-@example "get field details for an account" { sf sobject describe Account | get fields | select name type label }
-export def "sf sobject describe" [
+@example "describe an account" { sf describe Account }
+@example "get field details for an account" { sf describe Account | get fields | select name type label }
+export def "sf describe" [
     object: string # SObject type
 ] {
     let sf = $env.SALESFORCE
@@ -149,8 +149,8 @@ export def "sf sobject describe" [
 }
 
 # Get the metadata for an SObject (lighter than describe).
-@example "get account metadata" { sf sobject metadata Account }
-export def "sf sobject metadata" [
+@example "get account metadata" { sf metadata Account }
+export def "sf metadata" [
     object: string # SObject type
 ] {
     let sf = $env.SALESFORCE
@@ -158,8 +158,8 @@ export def "sf sobject metadata" [
 }
 
 # List records that were deleted within a date range.
-@example "list deleted accounts in January 2024" { sf sobject deleted Account --start "2024-01-01T00:00:00+00:00" --end "2024-01-31T00:00:00+00:00" }
-export def "sf sobject deleted" [
+@example "list deleted accounts in January 2024" { sf deleted Account --start "2024-01-01T00:00:00+00:00" --end "2024-01-31T00:00:00+00:00" }
+export def "sf deleted" [
     object: string # SObject type
     --start: string # Start datetime (ISO 8601)
     --end: string # End datetime (ISO 8601)
@@ -170,8 +170,8 @@ export def "sf sobject deleted" [
 }
 
 # List records that were updated within a date range.
-@example "list updated accounts in January 2024" { sf sobject updated Account --start "2024-01-01T00:00:00+00:00" --end "2024-01-31T00:00:00+00:00" }
-export def "sf sobject updated" [
+@example "list updated accounts in January 2024" { sf updated Account --start "2024-01-01T00:00:00+00:00" --end "2024-01-31T00:00:00+00:00" }
+export def "sf updated" [
     object: string # SObject type
     --start: string # Start datetime (ISO 8601)
     --end: string # End datetime (ISO 8601)

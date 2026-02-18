@@ -28,13 +28,13 @@ sf login --username "user@example.com" --password "xxxxxxxx" --token "xxxxxxxx"
 sf query "SELECT Id, Name FROM Account LIMIT 10"
 
 # 3. Create a record
-sf sobject create Account { Name: "Acme Corp", Industry: "Technology" }
+sf create Account { Name: "Acme Corp", Industry: "Technology" }
 
 # 4. Update a record
-sf sobject update Account 001XXXXXXXXXXXX { Name: "Updated Name" }
+sf update Account 001XXXXXXXXXXXX { Name: "Updated Name" }
 
 # 5. Delete a record
-sf sobject delete Account 001XXXXXXXXXXXX
+sf delete Account 001XXXXXXXXXXXX
 
 # 6. Call a generic REST endpoint
 sf rest "limits/"
@@ -77,16 +77,16 @@ sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD
 | `sf query-more` | Fetch the next page of query results |
 | `sf search` | Run a SOSL search |
 | `sf quick-search` | Shorthand SOSL search |
-| `sf sobject get` | Get a record by ID |
-| `sf sobject get-by-custom-id` | Get a record by external ID |
-| `sf sobject create` | Create a new record |
-| `sf sobject update` | Update an existing record |
-| `sf sobject upsert` | Upsert a record via external ID |
-| `sf sobject delete` | Delete a record |
-| `sf sobject describe` | Describe an SObject's metadata |
-| `sf sobject metadata` | Get lightweight SObject metadata |
-| `sf sobject deleted` | List records deleted in a date range |
-| `sf sobject updated` | List records updated in a date range |
+| `sf get` | Get a record by ID |
+| `sf get-by-custom-id` | Get a record by external ID |
+| `sf create` | Create a new record |
+| `sf update` | Update an existing record |
+| `sf upsert` | Upsert a record via external ID |
+| `sf delete` | Delete a record |
+| `sf describe` | Describe an SObject's metadata |
+| `sf metadata` | Get lightweight SObject metadata |
+| `sf deleted` | List records deleted in a date range |
+| `sf updated` | List records updated in a date range |
 | `sf rest` | Generic REST API call |
 | `sf apex` | Call an Apex REST endpoint |
 | `sf tooling` | Call the Tooling API |
@@ -100,7 +100,7 @@ Every command has built-in documentation. Use `help` to view a command's descrip
 
 ```nu
 help sf query
-help sf sobject create
+help sf create
 help sf login
 ```
 
