@@ -29,7 +29,7 @@ export def "sf get-by-custom-id" [
     custom_id: string # The external ID value
 ] {
     let sf = $env.SALESFORCE
-    let url = $"($sf.base_url)sobjects/($object)/($custom_id_field)/($custom_id)"
+    let url = $"($sf.base_url)sobjects/($object)/($custom_id_field)/($custom_id | url encode --all)"
     sf-call "GET" $url
 }
 
@@ -44,7 +44,7 @@ export def "sf get-by-custom-id" [
 │ errors  │ [list 0 items]     │
 ╰─────────┴────────────────────╯
 "
-@example "create an account piping the values into the command" { {Name: "Acme Corp"} | sf sobject create Account } --result "
+@example "create an account piping the values into the command" { {Name: "Acme Corp"} | sf create Account } --result "
 ╭─────────┬────────────────────╮
 │ id      │ 001Paxxxxxxxxxxxxx │
 │ success │ true               │
@@ -70,7 +70,7 @@ export def "sf create" [
 
 # Update an existing Salesforce record.
 @example "update an account" { sf update Account 001XXXXXXXXXXXX {Name: "Updated Corp"} }
-@example "update an account by piping data" { {Name: "Updated Corp"} | sf sobject update Account 001XXXXXXXXXXXX }
+@example "update an account by piping data" { {Name: "Updated Corp"} | sf update Account 001XXXXXXXXXXXX }
 export def "sf update" [
     object: string # SObject type
     record_id: string # The record ID to update
@@ -108,7 +108,7 @@ export def "sf upsert" [
 ] {
     let input = $in
     let sf = $env.SALESFORCE
-    let url = $"($sf.base_url)sobjects/($object)/($ext_id_field)/($ext_id_value)"
+    let url = $"($sf.base_url)sobjects/($object)/($ext_id_field)/($ext_id_value | url encode --all)"
 
     let body = if ($data != null) { $data } else { $input }
 

@@ -91,7 +91,7 @@ sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD
 | `sf apex` | Call an Apex REST endpoint |
 | `sf tooling` | Call the Tooling API |
 | `sf limits` | Show org API usage limits |
-| `sf describe` | Describe all available SObjects |
+| `sf describe-all` | Describe all available SObjects |
 | `load-env-file` | Loads key-value data from a .env file |
 
 ## Learning More
