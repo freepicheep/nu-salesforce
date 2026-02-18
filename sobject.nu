@@ -29,7 +29,7 @@ export def "sf get-by-custom-id" [
     custom_id: string # The external ID value
 ] {
     let sf = $env.SALESFORCE
-    let url = $"($sf.base_url)sobjects/($object)/($custom_id_field)/($custom_id)"
+    let url = $"($sf.base_url)sobjects/($object)/($custom_id_field)/($custom_id | url encode --all)"
     sf-call "GET" $url
 }
 
@@ -108,7 +108,7 @@ export def "sf upsert" [
 ] {
     let input = $in
     let sf = $env.SALESFORCE
-    let url = $"($sf.base_url)sobjects/($object)/($ext_id_field)/($ext_id_value)"
+    let url = $"($sf.base_url)sobjects/($object)/($ext_id_field)/($ext_id_value | url encode --all)"
 
     let body = if ($data != null) { $data } else { $input }
 
