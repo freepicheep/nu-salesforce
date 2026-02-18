@@ -44,7 +44,7 @@ export def "sf get-by-custom-id" [
 │ errors  │ [list 0 items]     │
 ╰─────────┴────────────────────╯
 "
-@example "create an account piping the values into the command" { {Name: "Acme Corp"} | sf sobject create Account } --result "
+@example "create an account piping the values into the command" { {Name: "Acme Corp"} | sf create Account } --result "
 ╭─────────┬────────────────────╮
 │ id      │ 001Paxxxxxxxxxxxxx │
 │ success │ true               │
@@ -70,7 +70,7 @@ export def "sf create" [
 
 # Update an existing Salesforce record.
 @example "update an account" { sf update Account 001XXXXXXXXXXXX {Name: "Updated Corp"} }
-@example "update an account by piping data" { {Name: "Updated Corp"} | sf sobject update Account 001XXXXXXXXXXXX }
+@example "update an account by piping data" { {Name: "Updated Corp"} | sf update Account 001XXXXXXXXXXXX }
 export def "sf update" [
     object: string # SObject type
     record_id: string # The record ID to update
