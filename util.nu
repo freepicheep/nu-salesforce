@@ -33,6 +33,7 @@ export def build-headers [session_id: string] {
         Content-Type: "application/json"
         Authorization: $"Bearer ($session_id)"
         X-PrettyPrint: "1"
+        Sforce-Call-Options: "client=nu-salesforce"
     }
 }
 
