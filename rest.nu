@@ -59,8 +59,8 @@ export def "sf limits" [] {
 }
 
 # Describe all available SObjects in the org.
-@example "describe all sobjects" { sf describe }
-@example "list sobject names and labels" { sf describe | get sobjects | select name label }
+@example "describe all sobjects" { sf describe-all }
+@example "list sobject names and labels" { sf describe-all | get sobjects | select name label }
 export def "sf describe-all" [] {
     let sf = $env.SALESFORCE
     sf-call "GET" $"($sf.base_url)sobjects"
