@@ -7,15 +7,15 @@ use util.nu [ build-session xml-find-text ]
 #
 # Supports two modes:
 # 1. Password + Security Token (SOAP login):
-#      sf login --username user@example.com --password secret --token XXXXX
+#      sf login --username user@example.com --password XXXXXXXX --token XXXXXXXX
 # 2. Direct session access:
-#      sf login --session-id 00D... --instance na1.salesforce.com
+#      sf login --session-id XXXXXXXX --instance yourdomain.my.salesforce.com
 export def --env "sf login" [
     --username: string # Salesforce username
     --password: string # Password for the username
     --token: string # Security token for the username
     --session-id: string # Direct access token (alternative to user/pass)
-    --instance: string # Domain of your Salesforce instance (e.g. na1.salesforce.com)
+    --instance: string # Domain of your Salesforce instance (yourdomain.my.salesforce.com)
     --domain: string # Login domain: "login" (production) or "test" (sandbox). Default: "login"
     --version: string # Salesforce API version. Default: "59.0"
 ] {

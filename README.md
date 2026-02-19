@@ -46,6 +46,10 @@ sf whoami
 sf logout
 ```
 
+### Credential Management
+
+**With Email, Password, and Security Token**
+
 If you store your Salesforce username, password, and security token in a `.env` file, you can use the `load-env-file` function to add those to your environment variables.[^1]
 
 **Your `.env` File**
@@ -64,6 +68,24 @@ load-env-file
 
 # login to salesforce with your credentials
 sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD --token $env.SECURITY_TOKEN
+```
+
+**With Session Id and Instance**
+
+If you want to login using a session id, you can obtain it several ways. One way is to run the following script in an "Execute Anonymous Window" and copy the id from the debug output in the console.
+
+```apex
+String id = UserInfo.getSessionId().Substring(15);
+
+System.debug('My session id: ' + id);
+```
+
+Your instance is usually `yourdomain.my.salesforce.com`.
+
+You can then log in to nu-salesforce like this:
+
+```nu
+sf login --session 'your_session_id' --instance 'yourdomain.my.salesforce.com'
 ```
 
 ## Commands
