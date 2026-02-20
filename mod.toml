@@ -1,0 +1,6 @@
+[package]
+name = "nu-salesforce"
+version = "0.2.0"
+description = "query and update your salesforce data from nu"
+nu-version = ">=0.110.0"
+
