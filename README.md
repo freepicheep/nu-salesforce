@@ -12,11 +12,23 @@ A [Nushell](https://www.nushell.sh/) module for interacting with the Salesforce 
 
 ## Installation
 
+**Git Clone**
+
 Clone this repository (or copy the `nu-salesforce` directory) somewhere on your machine, then import it in your Nushell session or config:
 
 ```nu
 use /path/to/nu-salesforce *
 ```
+
+**Using nuance (an *very* experimental module manager for nu)**
+
+First, install `nuance` if you haven't already.
+
+```
+cargo install --git https://github.com/freepicheep/nuance
+```
+
+Then, in your project directory, run `nuance init`. This creates the `mod.toml` necessary for managing dependencies and publishing your package if you choose to do so. Then, all you have to do is run `nuance add "https://github.com/freepicheep/nu-salesforce"` to install this module into your project's `.nu-modules/` directory. If you are writing code that uses this module, add `use ./nu-modules/nu-salesforce *` to your code to load the module.
 
 ## Quick Start
 
