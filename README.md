@@ -24,9 +24,9 @@ use /path/to/nu-salesforce *
 
 First, install `nuance` if you haven't already.
 
-```
-cargo install --git https://github.com/freepicheep/nuance
-```
+1. Using brew: `brew install freepicheep/tap/nuance`
+2. Build from source using `cargo`: `cargo install --git https://github.com/freepicheep/nuance`
+3. Shell script: `curl --proto '=https' --tlsv1.2 -LsSf https://github.com/freepicheep/nuance/releases/latest/download/nuance-installer.sh | sh`
 
 Then, in your project directory, run `nuance init`. This creates the `mod.toml` necessary for managing dependencies and publishing your package if you choose to do so. Then, all you have to do is run `nuance add "https://github.com/freepicheep/nu-salesforce"` to install this module into your project's `.nu-modules/` directory. If you are writing code that uses this module, add `use ./nu-modules/nu-salesforce *` to your code to load the module.
 
