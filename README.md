@@ -12,6 +12,17 @@ A [Nushell](https://www.nushell.sh/) module for interacting with the Salesforce 
 
 ## Installation
 
+**Using Quiver (an experimental project manager for nu)**
+
+First, install Quiver if you haven't already.
+
+1. brew: `brew install freepicheep/tap/quiver`
+2. mise: `mise use -g github:freepicheep/quiver`
+3. cargo: `cargo install --git https://github.com/freepicheep/quiver`
+4. shell script: `curl --proto '=https' --tlsv1.2 -LsSf https://github.com/freepicheep/quiver/releases/latest/download/quiver-installer.sh | sh`
+
+Then, in your project directory, run `qv init`. This creates the `nupackage.toml` for managing dependencies and publishing your package if you choose to do so. Then, all you have to do is run `qv add freepicheep/nu-salesforce` to install this module into your project's `.nu-env/modules/` directory. Follow the instructions in the Quiver README for running code with your managed Nu environment.
+
 **Git Clone**
 
 Clone this repository (or copy the `nu-salesforce` directory) somewhere on your machine, then import it in your Nushell session or config:
@@ -19,16 +30,6 @@ Clone this repository (or copy the `nu-salesforce` directory) somewhere on your 
 ```nu
 use /path/to/nu-salesforce *
 ```
-
-**Using nuance (an *very* experimental module manager for nu)**
-
-First, install `nuance` if you haven't already.
-
-1. Using brew: `brew install freepicheep/tap/nuance`
-2. Build from source using `cargo`: `cargo install --git https://github.com/freepicheep/nuance`
-3. Shell script: `curl --proto '=https' --tlsv1.2 -LsSf https://github.com/freepicheep/nuance/releases/latest/download/nuance-installer.sh | sh`
-
-Then, in your project directory, run `nuance init`. This creates the `mod.toml` necessary for managing dependencies and publishing your package if you choose to do so. Then, all you have to do is run `nuance add "https://github.com/freepicheep/nu-salesforce"` to install this module into your project's `.nu-modules/` directory. If you are writing code that uses this module, add `use ./nu-modules/nu-salesforce/nu-salesforce *` to your code to load the module.
 
 ## Quick Start
 
