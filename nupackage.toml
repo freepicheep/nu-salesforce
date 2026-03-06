@@ -1,9 +1,7 @@
 [package]
 name = "nu-salesforce"
-version = "0.3.0"
-description = "query and update your salesforce data from nu"
+version = "0.3.1"
+description = "Query and update your Salesforce data with Nu"
 license = "MIT"
-authors = [
-  "Friedrich Stoltzfus"
-]
-nu-version = "0.110.0"
+authors = ["Friedrich Stoltzfus"]
+nu-version = ">=0.110.0"
