@@ -12,7 +12,7 @@ A [Nushell](https://www.nushell.sh/) module for interacting with the Salesforce 
 
 ## Installation
 
-**Using Quiver (an experimental project manager for nu)**
+**Using Quiver**
 
 First, install Quiver if you haven't already.
 
