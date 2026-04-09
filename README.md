@@ -12,7 +12,7 @@ A [Nushell](https://www.nushell.sh/) module for interacting with the Salesforce 
 
 ## Installation
 
-**Using [Quiver]([url](https://github.com/freepicheep/quiver))**
+**Using [Quiver](https://github.com/freepicheep/quiver)**
 
 First, install Quiver if you haven't already.
 
