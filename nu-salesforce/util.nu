@@ -206,6 +206,28 @@ export def xml-find-text [xml: record tag_name: string] {
     null
 }
 
+export def strip-attributes [value: any] {
+    let kind = ($value | describe)
+
+    if ($kind | str starts-with "record") {
+        $value
+        | reject -o attributes
+        | update cells {|cell| strip-attributes $cell }
+    } else if ($kind | str starts-with "table") or ($kind | str starts-with "list") {
+        $value | each {|item| strip-attributes $item }
+    } else {
+        $value
+    }
+}
+
+export def format-query-records [records: any include_attributes: bool] {
+    if $include_attributes {
+        $records
+    } else {
+        strip-attributes $records
+    }
+}
+
 # Loads environment variables from a file
 export def --env load-env-file [path?: path = '.env'] {
     if ($path | path exists) {

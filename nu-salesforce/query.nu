@@ -1,21 +1,24 @@
 # SOQL query and SOSL search commands for Salesforce.
 
-use util.nu [ sf-call validate-soql ]
+use util.nu [ sf-call validate-soql format-query-records ]
 
 # Run a SOQL query against Salesforce.
 #
-# Returns the records as a table by default.
+# Returns the records as a table by default, with Salesforce attributes metadata removed.
+# Use --include-attributes to keep the attributes fields in each returned record.
 # Use --raw to get the full Salesforce response (includes totalSize, done, etc).
 # Use --all to auto-paginate through all result pages.
 # Use --include-deleted to query deleted/archived records (uses queryAll/ endpoint).
 @example "query accounts" { sf query "SELECT Id, Name FROM Account LIMIT 10" }
 @example "query all leads with auto-pagination" { sf query --all "SELECT Id, Name FROM Lead" }
+@example "keep Salesforce attributes metadata" { sf query --include-attributes "SELECT Id, Product2.Name FROM Asset LIMIT 1" }
 @example "get raw query response" { sf query --raw "SELECT Id FROM Contact" }
 @example "query deleted records" { sf query "SELECT Id FROM Account WHERE IsDeleted = true" --include-deleted }
 export def "sf query" [
     soql: string # The SOQL query string
     --all # Auto-paginate to fetch all records
     --raw # Return the raw Salesforce JSON response
+    --include-attributes # Keep Salesforce attributes metadata in each returned record
     --include-deleted # Include deleted/archived records (queryAll endpoint)
 ] {
     # basic soql validation before hitting the Salesforce API
@@ -42,22 +45,22 @@ export def "sf query" [
             $all_records = ($all_records | append $current.records)
         }
 
-        # reject attributes column for clean output
-        $all_records | reject -o attributes
+        format-query-records $all_records $include_attributes
     } else {
-        # reject attributes column for clean output
-        $result.records | reject -o attributes
+        format-query-records $result.records $include_attributes
     }
 }
 
 # Fetch the next page of results from a previous query.
 #
 # Use this when you get partial results and want manual pagination control.
+# Returned records omit Salesforce attributes metadata by default.
 # Pass the nextRecordsUrl from a --raw query response.
 @example "fetch the next page of query results" { let page1 = (sf query --raw "SELECT Id FROM Account"); if (not $page1.done) { sf query-more $page1.nextRecordsUrl } }
 export def "sf query-more" [
     next_records_url: string # The nextRecordsUrl from a previous query response
     --raw # Return the raw Salesforce JSON response
+    --include-attributes # Keep Salesforce attributes metadata in each returned record
 ] {
     let sf = $env.SALESFORCE
     let url = $"https://($sf.instance)($next_records_url)"
@@ -67,7 +70,7 @@ export def "sf query-more" [
         return $result
     }
 
-    $result.records | reject -o attributes
+    format-query-records $result.records $include_attributes
 }
 
 # Run a SOSL search against Salesforce.

@@ -40,6 +40,9 @@ sf login --username "user@example.com" --password "xxxxxxxx" --token "xxxxxxxx"
 # 2. Query records
 sf query "SELECT Id, Name FROM Account LIMIT 10"
 
+# Keep Salesforce attributes metadata when needed
+sf query --include-attributes "SELECT Id, Name FROM Account LIMIT 10"
+
 # 3. Create a record
 sf create Account { Name: "Acme Corp", Industry: "Technology" }
 
@@ -128,6 +131,8 @@ sf login --session 'your_session_id' --instance 'yourdomain.my.salesforce.com'
 | `sf limits` | Show org API usage limits |
 | `sf describe-all` | Describe all available SObjects |
 | `load-env-file` | Loads key-value data from a .env file |
+
+`sf query` and `sf query-more` remove Salesforce `attributes` records from returned records by default for cleaner Nushell tables. Use `--include-attributes` to keep that metadata, or `--raw` to inspect the full API response.
 
 ## Learning More
 
