@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>query</title>
+  <meta name="description" content="SOQL query and SOSL search commands for Salesforce.">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <p class="eyebrow">Nu Module Docs</p>
+        <h1 class="site-title">nu-salesforce</h1>
+        <p class="site-summary">nu-salesforce — A Nushell module for interacting with the Salesforce REST API.</p>
+      </div>
+      <button class="sidebar-toggle" data-nav-toggle>Sections</button>
+      <div class="sidebar-nav" data-nav>
+        <div class="nav-search-wrap">
+          <input class="nav-search" type="search" placeholder="Filter categories or commands" autocomplete="off" spellcheck="false" data-nav-search>
+          <div class="nav-search-dropdown" hidden data-search-dropdown></div>
+        </div>
+        <p class="nav-group-title">Overview</p>
+<ul class="nav-list">
+  <li><a class="nav-link" href="index.html">Introduction</a></li>
+</ul>
+<p class="nav-group-title">Categories</p>
+<ul class="nav-list">
+<li data-category-item data-search="auth Authentication commands for Salesforce.
+Supports password+token (SOAP login) and direct session ID. sf login sf logout sf whoami">
+  <a class="nav-link" href="auth.html">auth</a>
+  
+</li>
+<li data-category-item data-search="bulk Salesforce Bulk API 2.0 commands for nu-salesforce.
+
+Provides commands for large-scale data operations (insert, update, upsert,
+delete, hard-delete, query) using the Salesforce Bulk API 2.0.
+
+The Bulk API uses CSV for data transfer and is designed for loading or
+querying large sets of data. The workflow is:
+  1. Create a job
+  2. Upload CSV data (for ingest) or wait for query results
+  3. Close the job / signal upload complete
+  4. Poll until the job completes
+  5. Retrieve results (successful, failed, unprocessed records)
+
+Usage:
+  # Insert records from a Nu table
+  [{Name: &quot;Acme&quot;}, {Name: &quot;Globex&quot;}] | sf bulk insert Account
+
+  # Insert from a CSV file
+  sf bulk insert Account --file accounts.csv
+
+  # Bulk query
+  sf bulk query Account &quot;SELECT Id, Name FROM Account&quot;
+
+  # Check job status
+  sf bulk status &lt;job-id&gt;
+
+─── Internal Helpers ───────────────────────────────────────────────────────
+
+Construct the Bulk API 2.0 URL for ingest or query jobs. sf bulk insert sf bulk update sf bulk upsert sf bulk delete sf bulk hard-delete sf bulk query sf bulk status sf bulk results sf bulk failures sf bulk unprocessed sf bulk abort sf bulk delete-job sf bulk list-jobs">
+  <a class="nav-link" href="bulk.html">bulk</a>
+  
+</li>
+<li data-category-item data-search="query SOQL query and SOSL search commands for Salesforce. sf query sf query-more sf search sf quick-search">
+  <a class="nav-link is-active" href="query.html">query</a>
+  <ul class="nav-sublist">
+<li data-command-item data-search="sf query"><a class="nav-link" data-command-link href="query.html#sf-query">sf query</a></li>
+<li data-command-item data-search="sf query-more"><a class="nav-link" data-command-link href="query.html#sf-query-more">sf query-more</a></li>
+<li data-command-item data-search="sf search"><a class="nav-link" data-command-link href="query.html#sf-search">sf search</a></li>
+<li data-command-item data-search="sf quick-search"><a class="nav-link" data-command-link href="query.html#sf-quick-search">sf quick-search</a></li>
+</ul>
+</li>
+<li data-category-item data-search="rest Generic REST, Apex, and Tooling API commands for Salesforce. sf rest sf apex sf tooling sf limits sf describe-all">
+  <a class="nav-link" href="rest.html">rest</a>
+  
+</li>
+<li data-category-item data-search="sobject SObject CRUD commands for Salesforce.
+These map to the REST API endpoints for individual SObject operations. sf get sf get-by-custom-id sf create sf update sf upsert sf delete sf describe sf metadata sf deleted sf updated">
+  <a class="nav-link" href="sobject.html">sobject</a>
+  
+</li>
+<li data-category-item data-search="util Shared utility helpers for the nu-salesforce module.
+These are internal helpers — not exported from the module. build-session build-headers sf-call sf-error validate-soql to-sf-datetime xml-find-text strip-attributes format-query-records load-env-file from kv">
+  <a class="nav-link" href="util.html">util</a>
+  
+</li>
+</ul>
+      </div>
+    </aside>
+    <div class="content-wrap">
+      <header class="page-header">
+        <div class="page-header-inner">
+          <h1 class="page-title">query</h1>
+          <p class="page-lead">SOQL query and SOSL search commands for Salesforce.</p>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="summary-strip"><span class="summary-pill">File: <code>query.nu</code></span>
+<span class="summary-pill">4 commands</span></div>
+<section class="command-stack">
+<article class="command-section" id="sf-query"><h2><code>sf query</code></h2>
+<div class="command-description"><p>Run a SOQL query against Salesforce.</p>
+<p>Returns the records as a table by default, with Salesforce attributes metadata removed. Use --include-attributes to keep the attributes fields in each returned record. Use --raw to get the full Salesforce response (includes totalSize, done, etc). Use --all to auto-paginate through all result pages. Use --include-deleted to query deleted/archived records (uses queryAll/ endpoint).</p></div>
+<section class="doc-section"><h3>Usage</h3>
+<pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query {flags} &lt;soql&gt;</code></pre>
+</section>
+<section class="doc-section"><h3>Flags</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>-h, --help</code></dt><dd>Display the help message for this command</dd></div>
+<div class="def-item"><dt><code>--all</code></dt><dd>Auto-paginate to fetch all records</dd></div>
+<div class="def-item"><dt><code>--raw</code></dt><dd>Return the raw Salesforce JSON response</dd></div>
+<div class="def-item"><dt><code>--include-attributes</code></dt><dd>Keep Salesforce attributes metadata in each returned record</dd></div>
+<div class="def-item"><dt><code>--include-deleted</code></dt><dd>Include deleted/archived records (queryAll endpoint)</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Parameters</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>soql &lt;string&gt;</code></dt><dd>The SOQL query string</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Input/output types</h3>
+<table class="io-table"><thead><tr><th>#</th><th>input</th><th>output</th></tr></thead><tbody>
+<tr><td>0</td><td>any</td><td>any</td></tr>
+</tbody></table>
+</section>
+<section class="doc-section"><h3>Examples</h3>
+<div class="example-block"><p class="example-label">query accounts</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query &quot;SELECT Id, Name FROM Account LIMIT 10&quot;</code></pre></div>
+<div class="example-block"><p class="example-label">query all leads with auto-pagination</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query --all &quot;SELECT Id, Name FROM Lead&quot;</code></pre></div>
+<div class="example-block"><p class="example-label">keep Salesforce attributes metadata</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query --include-attributes &quot;SELECT Id, Product2.Name FROM Asset LIMIT 1&quot;</code></pre></div>
+<div class="example-block"><p class="example-label">get raw query response</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query --raw &quot;SELECT Id FROM Contact&quot;</code></pre></div>
+<div class="example-block"><p class="example-label">query deleted records</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query &quot;SELECT Id FROM Account WHERE IsDeleted = true&quot; --include-deleted</code></pre></div>
+</section>
+</article>
+<article class="command-section" id="sf-query-more"><h2><code>sf query-more</code></h2>
+<div class="command-description"><p>Fetch the next page of results from a previous query.</p>
+<p>Use this when you get partial results and want manual pagination control. Returned records omit Salesforce attributes metadata by default. Pass the nextRecordsUrl from a --raw query response.</p></div>
+<section class="doc-section"><h3>Usage</h3>
+<pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf query-more {flags} &lt;next_records_url&gt;</code></pre>
+</section>
+<section class="doc-section"><h3>Flags</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>-h, --help</code></dt><dd>Display the help message for this command</dd></div>
+<div class="def-item"><dt><code>--raw</code></dt><dd>Return the raw Salesforce JSON response</dd></div>
+<div class="def-item"><dt><code>--include-attributes</code></dt><dd>Keep Salesforce attributes metadata in each returned record</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Parameters</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>next_records_url &lt;string&gt;</code></dt><dd>The nextRecordsUrl from a previous query response</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Input/output types</h3>
+<table class="io-table"><thead><tr><th>#</th><th>input</th><th>output</th></tr></thead><tbody>
+<tr><td>0</td><td>any</td><td>any</td></tr>
+</tbody></table>
+</section>
+<section class="doc-section"><h3>Examples</h3>
+<div class="example-block"><p class="example-label">fetch the next page of query results</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">let page1 = (sf query --raw &quot;SELECT Id FROM Account&quot;); if (not $page1.done) { sf query-more $page1.nextRecordsUrl }</code></pre></div>
+</section>
+</article>
+<article class="command-section" id="sf-search"><h2><code>sf search</code></h2>
+<div class="command-description"><p>Run a SOSL search against Salesforce.</p>
+<p>Pass the full SOSL query string (e.g. &quot;FIND {Waldo}&quot;).</p></div>
+<section class="doc-section"><h3>Usage</h3>
+<pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf search &lt;sosl&gt;</code></pre>
+</section>
+<section class="doc-section"><h3>Flags</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>-h, --help</code></dt><dd>Display the help message for this command</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Parameters</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>sosl &lt;string&gt;</code></dt><dd>The SOSL search string</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Input/output types</h3>
+<table class="io-table"><thead><tr><th>#</th><th>input</th><th>output</th></tr></thead><tbody>
+<tr><td>0</td><td>any</td><td>any</td></tr>
+</tbody></table>
+</section>
+<section class="doc-section"><h3>Examples</h3>
+<div class="example-block"><p class="example-label">search for accounts matching Acme</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf search &quot;FIND {Acme} IN ALL FIELDS RETURNING Account(Id, Name)&quot;</code></pre></div>
+</section>
+</article>
+<article class="command-section" id="sf-quick-search"><h2><code>sf quick-search</code></h2>
+<div class="command-description"><p>Run a quick SOSL search — wraps the search term in FIND {...}.</p></div>
+<section class="doc-section"><h3>Usage</h3>
+<pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf quick-search &lt;term&gt;</code></pre>
+</section>
+<section class="doc-section"><h3>Flags</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>-h, --help</code></dt><dd>Display the help message for this command</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Parameters</h3>
+<dl class="def-list">
+<div class="def-item"><dt><code>term &lt;string&gt;</code></dt><dd>The search term (will be wrapped in FIND {...})</dd></div>
+</dl>
+</section>
+<section class="doc-section"><h3>Input/output types</h3>
+<table class="io-table"><thead><tr><th>#</th><th>input</th><th>output</th></tr></thead><tbody>
+<tr><td>0</td><td>any</td><td>any</td></tr>
+</tbody></table>
+</section>
+<section class="doc-section"><h3>Examples</h3>
+<div class="example-block"><p class="example-label">quick search for Acme</p><pre data-shiki-lang="nushell"><code class="language-nushell" data-shiki-source="nushell">sf quick-search &quot;Acme&quot;</code></pre></div>
+</section>
+</article>
+</section>
+      </main>
+    </div>
+  </div>
+  <script type="application/json" id="search-index">[{"kind":"category","title":"auth","category":"auth","summary":"Authentication commands for Salesforce.\nSupports password+token (SOAP login) and direct session ID.","url":"auth.html","file":"auth.nu"},{"kind":"command","title":"sf login","category":"auth","summary":"Log in to Salesforce and set $env.SALESFORCE.","url":"auth.html#sf-login","file":"auth.nu"},{"kind":"command","title":"sf logout","category":"auth","summary":"Clear the Salesforce session.","url":"auth.html#sf-logout","file":"auth.nu"},{"kind":"command","title":"sf whoami","category":"auth","summary":"Show current Salesforce session information.","url":"auth.html#sf-whoami","file":"auth.nu"},{"kind":"category","title":"bulk","category":"bulk","summary":"Salesforce Bulk API 2.0 commands for nu-salesforce.\n\nProvides commands for large-scale data operations (insert, update, upsert,\ndelete, hard-delete, query) using the Salesforce Bulk API 2.0.\n\nThe Bulk API uses CSV for data transfer and is designed for loading or\nquerying large sets of data. The workflow is:\n  1. Create a job\n  2. Upload CSV data (for ingest) or wait for query results\n  3. Close the job / signal upload complete\n  4. Poll until the job completes\n  5. Retrieve results (successful, failed, unprocessed records)\n\nUsage:\n  # Insert records from a Nu table\n  [{Name: \"Acme\"}, {Name: \"Globex\"}] | sf bulk insert Account\n\n  # Insert from a CSV file\n  sf bulk insert Account --file accounts.csv\n\n  # Bulk query\n  sf bulk query Account \"SELECT Id, Name FROM Account\"\n\n  # Check job status\n  sf bulk status <job-id>\n\n─── Internal Helpers ───────────────────────────────────────────────────────\n\nConstruct the Bulk API 2.0 URL for ingest or query jobs.","url":"bulk.html","file":"bulk.nu"},{"kind":"command","title":"sf bulk insert","category":"bulk","summary":"Insert records into Salesforce using the Bulk API 2.0.\n\nAccepts a table of records from the pipeline or a CSV file path.\nReturns a summary with the job ID and record counts.","url":"bulk.html#sf-bulk-insert","file":"bulk.nu"},{"kind":"command","title":"sf bulk update","category":"bulk","summary":"Update existing records in Salesforce using the Bulk API 2.0.\n\nThe input data must include the Id field for each record.","url":"bulk.html#sf-bulk-update","file":"bulk.nu"},{"kind":"command","title":"sf bulk upsert","category":"bulk","summary":"Upsert records in Salesforce using the Bulk API 2.0.\n\nIf a record with the given external ID exists, it is updated;\notherwise a new record is created.","url":"bulk.html#sf-bulk-upsert","file":"bulk.nu"},{"kind":"command","title":"sf bulk delete","category":"bulk","summary":"Delete records from Salesforce using the Bulk API 2.0.\n\nThe input data must contain only the Id field.","url":"bulk.html#sf-bulk-delete","file":"bulk.nu"},{"kind":"command","title":"sf bulk hard-delete","category":"bulk","summary":"Hard-delete records from Salesforce using the Bulk API 2.0.\n\nUnlike soft-delete, hard-deleted records are not recoverable\nfrom the Salesforce recycle bin.\nThe input data must contain only the Id field.","url":"bulk.html#sf-bulk-hard-delete","file":"bulk.nu"},{"kind":"command","title":"sf bulk query","category":"bulk","summary":"Run a bulk SOQL query using the Bulk API 2.0.\n\nCreates a query job, waits for completion, and returns all results\nas a Nu table. Automatically paginates through large result sets.","url":"bulk.html#sf-bulk-query","file":"bulk.nu"},{"kind":"command","title":"sf bulk status","category":"bulk","summary":"Get the status of a Bulk API 2.0 job.\n\nReturns a record with job state, record counts, and other metadata.","url":"bulk.html#sf-bulk-status","file":"bulk.nu"},{"kind":"command","title":"sf bulk results","category":"bulk","summary":"Get the successful results from a completed Bulk API 2.0 ingest job.\n\nReturns a table with sf__Id, sf__Created, and the original data fields.","url":"bulk.html#sf-bulk-results","file":"bulk.nu"},{"kind":"command","title":"sf bulk failures","category":"bulk","summary":"Get the failed results from a completed Bulk API 2.0 ingest job.\n\nReturns a table with sf__Id, sf__Error, and the original data fields.","url":"bulk.html#sf-bulk-failures","file":"bulk.nu"},{"kind":"command","title":"sf bulk unprocessed","category":"bulk","summary":"Get the unprocessed records from a Bulk API 2.0 ingest job.\n\nReturns a table of records that were not processed (e.g. due to job abort).","url":"bulk.html#sf-bulk-unprocessed","file":"bulk.nu"},{"kind":"command","title":"sf bulk abort","category":"bulk","summary":"Abort a running Bulk API 2.0 job.","url":"bulk.html#sf-bulk-abort","file":"bulk.nu"},{"kind":"command","title":"sf bulk delete-job","category":"bulk","summary":"Delete a Bulk API 2.0 job.\n\nRemoves the job and its associated data from Salesforce.\nThe job must be in a terminal state (JobComplete, Aborted, or Failed).","url":"bulk.html#sf-bulk-delete-job","file":"bulk.nu"},{"kind":"command","title":"sf bulk list-jobs","category":"bulk","summary":"List all Bulk API 2.0 ingest jobs.","url":"bulk.html#sf-bulk-list-jobs","file":"bulk.nu"},{"kind":"category","title":"query","category":"query","summary":"SOQL query and SOSL search commands for Salesforce.","url":"query.html","file":"query.nu"},{"kind":"command","title":"sf query","category":"query","summary":"Run a SOQL query against Salesforce.\n\nReturns the records as a table by default, with Salesforce attributes metadata removed.\nUse --include-attributes to keep the attributes fields in each returned record.\nUse --raw to get the full Salesforce response (includes totalSize, done, etc).\nUse --all to auto-paginate through all result pages.\nUse --include-deleted to query deleted/archived records (uses queryAll/ endpoint).","url":"query.html#sf-query","file":"query.nu"},{"kind":"command","title":"sf query-more","category":"query","summary":"Fetch the next page of results from a previous query.\n\nUse this when you get partial results and want manual pagination control.\nReturned records omit Salesforce attributes metadata by default.\nPass the nextRecordsUrl from a --raw query response.","url":"query.html#sf-query-more","file":"query.nu"},{"kind":"command","title":"sf search","category":"query","summary":"Run a SOSL search against Salesforce.\n\nPass the full SOSL query string (e.g. \"FIND {Waldo}\").","url":"query.html#sf-search","file":"query.nu"},{"kind":"command","title":"sf quick-search","category":"query","summary":"Run a quick SOSL search — wraps the search term in FIND {...}.","url":"query.html#sf-quick-search","file":"query.nu"},{"kind":"category","title":"rest","category":"rest","summary":"Generic REST, Apex, and Tooling API commands for Salesforce.","url":"rest.html","file":"rest.nu"},{"kind":"command","title":"sf rest","category":"rest","summary":"Make a generic REST API call to Salesforce.\n\nThe path is relative to the base REST URL\n(e.g. /services/data/v59.0/).","url":"rest.html#sf-rest","file":"rest.nu"},{"kind":"command","title":"sf apex","category":"rest","summary":"Make a call to a Salesforce Apex REST endpoint.\n\nThe action is appended to the Apex REST base URL\n(/services/apexrest/).","url":"rest.html#sf-apex","file":"rest.nu"},{"kind":"command","title":"sf tooling","category":"rest","summary":"Make a call to the Salesforce Tooling API.\n\nThe action is appended to the Tooling API base URL.","url":"rest.html#sf-tooling","file":"rest.nu"},{"kind":"command","title":"sf limits","category":"rest","summary":"Show the organization's API usage limits.","url":"rest.html#sf-limits","file":"rest.nu"},{"kind":"command","title":"sf describe-all","category":"rest","summary":"Describe all available SObjects in the org.","url":"rest.html#sf-describe-all","file":"rest.nu"},{"kind":"category","title":"sobject","category":"sobject","summary":"SObject CRUD commands for Salesforce.\nThese map to the REST API endpoints for individual SObject operations.","url":"sobject.html","file":"sobject.nu"},{"kind":"command","title":"sf get","category":"sobject","summary":"Get a Salesforce record by its ID.","url":"sobject.html#sf-get","file":"sobject.nu"},{"kind":"command","title":"sf get-by-custom-id","category":"sobject","summary":"Get a Salesforce record by a custom (external) ID field.","url":"sobject.html#sf-get-by-custom-id","file":"sobject.nu"},{"kind":"command","title":"sf create","category":"sobject","summary":"Create a new Salesforce record.\n\nAccepts data as a record (from argument or piped input).\nReturns the creation result with the new record's Id.","url":"sobject.html#sf-create","file":"sobject.nu"},{"kind":"command","title":"sf update","category":"sobject","summary":"Update an existing Salesforce record.","url":"sobject.html#sf-update","file":"sobject.nu"},{"kind":"command","title":"sf upsert","category":"sobject","summary":"Upsert a Salesforce record using an external ID field.\n\nIf a record with the given external ID exists, it's updated.\nIf not, a new record is created.","url":"sobject.html#sf-upsert","file":"sobject.nu"},{"kind":"command","title":"sf delete","category":"sobject","summary":"Delete a Salesforce record.","url":"sobject.html#sf-delete","file":"sobject.nu"},{"kind":"command","title":"sf describe","category":"sobject","summary":"Describe an SObject — returns its metadata (fields, relationships, etc).","url":"sobject.html#sf-describe","file":"sobject.nu"},{"kind":"command","title":"sf metadata","category":"sobject","summary":"Get the metadata for an SObject (lighter than describe).","url":"sobject.html#sf-metadata","file":"sobject.nu"},{"kind":"command","title":"sf deleted","category":"sobject","summary":"List records that were deleted within a date range.","url":"sobject.html#sf-deleted","file":"sobject.nu"},{"kind":"command","title":"sf updated","category":"sobject","summary":"List records that were updated within a date range.","url":"sobject.html#sf-updated","file":"sobject.nu"},{"kind":"category","title":"util","category":"util","summary":"Shared utility helpers for the nu-salesforce module.\nThese are internal helpers — not exported from the module.","url":"util.html","file":"util.nu"},{"kind":"command","title":"build-session","category":"util","summary":"Build the session record that gets stored in $env.SALESFORCE","url":"util.html#build-session","file":"util.nu"},{"kind":"command","title":"build-headers","category":"util","summary":"Build standard Salesforce REST API headers","url":"util.html#build-headers","file":"util.nu"},{"kind":"command","title":"sf-call","category":"util","summary":"Central HTTP helper for making Salesforce API calls.\nReturns the parsed response body (usually a record or table).\nAutomatically handles error responses.","url":"util.html#sf-call","file":"util.nu"},{"kind":"command","title":"sf-error","category":"util","summary":"Raise a structured Salesforce error based on status code.","url":"util.html#sf-error","file":"util.nu"},{"kind":"command","title":"validate-soql","category":"util","summary":"Validate a SOQL query string for common structural issues.\nRaises a descriptive error if problems are found.\nCall this before sending a SOQL query to the Salesforce API.","url":"util.html#validate-soql","file":"util.nu"},{"kind":"command","title":"to-sf-datetime","category":"util","summary":"Convert an ISO 8601 date string or datetime to Salesforce-compatible format.","url":"util.html#to-sf-datetime","file":"util.nu"},{"kind":"command","title":"xml-find-text","category":"util","summary":"Find a specific XML element by tag name in a parsed XML tree.","url":"util.html#xml-find-text","file":"util.nu"},{"kind":"command","title":"strip-attributes","category":"util","summary":"","url":"util.html#strip-attributes","file":"util.nu"},{"kind":"command","title":"format-query-records","category":"util","summary":"","url":"util.html#format-query-records","file":"util.nu"},{"kind":"command","title":"load-env-file","category":"util","summary":"Loads environment variables from a file","url":"util.html#load-env-file","file":"util.nu"},{"kind":"command","title":"from kv","category":"util","summary":"Parses `KEY=value` text into a record","url":"util.html#from-kv","file":"util.nu"}]</script>
+  <script src="assets/fuse.min.js"></script>
+  <script type="module" src="assets/site.js"></script>
+</body>
+</html>
