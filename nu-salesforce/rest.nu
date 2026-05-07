@@ -5,7 +5,7 @@ use util.nu [ sf-call ]
 # Make a generic REST API call to Salesforce.
 #
 # The path is relative to the base REST URL
-# (e.g. /services/data/v59.0/).
+# (e.g. /services/data/v64.0/).
 @example "list sobjects" { sf rest "sobjects" }
 @example "reset a user password" { sf rest "sobjects/User/005.../password" --method POST --data {NewPassword: "secret"} }
 @example "get org limits" { sf rest "limits/" }

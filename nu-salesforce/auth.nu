@@ -17,10 +17,10 @@ export def --env "sf login" [
     --session-id: string # Direct access token (alternative to user/pass)
     --instance: string # Domain of your Salesforce instance (yourdomain.my.salesforce.com)
     --domain: string # Login domain: "login" (production) or "test" (sandbox). Default: "login"
-    --version: string # Salesforce API version. Default: "59.0"
+    --version: string # Salesforce API version. Default: "64.0"
 ] {
     let domain = if ($domain != null) { $domain } else { "login" }
-    let version = if ($version != null) { $version } else { "59.0" }
+    let version = if ($version != null) { $version } else { "64.0" }
 
     if ($session_id != null and $instance != null) {
         # Direct session path
@@ -104,7 +104,7 @@ export def --env "sf login" [
     }
 
     # Extract the instance hostname from the serverUrl
-    # serverUrl looks like: https://na1.salesforce.com/services/Soap/u/59.0/00D...
+    # serverUrl looks like: https://na1.salesforce.com/services/Soap/u/64.0/00D...
     let sf_instance = (
         $server_url
         | str replace "https://" ""

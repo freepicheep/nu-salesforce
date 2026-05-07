@@ -1,12 +1,12 @@
 # Shared utility helpers for the nu-salesforce module.
 # These are internal helpers — not exported from the module.
-const DEFAULT_API_VERSION = "59.0"
+const DEFAULT_API_VERSION = "64.0"
 
 # Build the session record that gets stored in $env.SALESFORCE
 export def build-session [
     session_id: string
     instance: string
-    --version: string = "59.0"
+    --version: string = "64.0"
     --domain: string = "login"
     --auth-type: string = "direct"
 ] {
