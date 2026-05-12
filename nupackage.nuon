@@ -1,0 +1,10 @@
+{
+    package: {
+        name: nu-salesforce
+        version: "0.3.2"
+        description: "Query and update your Salesforce data with Nu"
+        license: MIT
+        authors: ["Friedrich Stoltzfus"]
+        nu-version: ">=0.110.0"
+    }
+}
