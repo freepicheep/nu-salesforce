@@ -138,6 +138,43 @@ export def "sf delete" [
     }
 }
 
+# Clone a Salesforce record, copying all createable fields to a new record.
+#
+# Describes the object to determine which fields can be set, fetches those fields
+# from the source record, and creates a new record. Use the optional `overrides`
+# argument to set or replace field values on the clone.
+#
+# For cloning hundreds or thousands of records, use `sf bulk clone` instead.
+@example "clone an account" { sf clone Account 001XXXXXXXXXXXX }
+@example "clone an account with a new name" { sf clone Account 001XXXXXXXXXXXX {Name: "Copy of Acme"} }
+export def "sf clone" [
+    object: string     # SObject type (e.g. Account, Contact)
+    record_id: string  # The ID of the record to clone
+    overrides?: record # Optional fields to override on the new record
+] {
+    let sf = $env.SALESFORCE
+
+    let fields = (
+        sf describe $object
+        | get fields
+        | where createable == true
+        | get name
+        | str join ","
+    )
+
+    let source = (sf-call "GET" $"($sf.base_url)sobjects/($object)/($record_id)" --params {fields: $fields})
+
+    let body = ($source | reject -o attributes)
+
+    let final_body = if ($overrides != null) {
+        $body | merge $overrides
+    } else {
+        $body
+    }
+
+    sf-call "POST" $"($sf.base_url)sobjects/($object)/" --data $final_body
+}
+
 # Describe an SObject — returns its metadata (fields, relationships, etc).
 @example "describe an account" { sf describe Account }
 @example "get field details for an account" { sf describe Account | get fields | select name type label }

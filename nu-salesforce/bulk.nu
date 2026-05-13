@@ -24,6 +24,9 @@
 #   # Check job status
 #   sf bulk status <job-id>
 
+use util.nu [sf-call]
+use sobject.nu ["sf describe"]
+
 # ─── Internal Helpers ───────────────────────────────────────────────────────
 
 # Construct the Bulk API 2.0 URL for ingest or query jobs.
@@ -283,6 +286,66 @@ def bulk-abort-ingest-job [job_id: string] {
 }
 
 # ─── Public Commands ────────────────────────────────────────────────────────
+
+# Clone multiple Salesforce records using the Bulk API 2.0.
+#
+# Accepts a table with at least an `Id` column piped in — compose with `sf query`
+# or `sf bulk query` to identify source records. Describes the object to determine
+# which fields are createable, fetches source data in chunks, and submits a single
+# Bulk API insert job to create all clones.
+#
+# For a single record, use `sf clone` instead.
+@example "clone all accounts in a region" {
+    sf query "SELECT Id FROM Account WHERE Region__c = 'East'" | sf bulk clone Account
+}
+@example "clone accounts into a new region" {
+    sf bulk query "SELECT Id FROM Account WHERE Region__c = 'East'" | sf bulk clone Account {Region__c: "West"}
+}
+export def "sf bulk clone" [
+    object: string       # SObject type (e.g. Account, Contact)
+    overrides?: record   # Optional fields to override on every cloned record
+    --poll-interval: duration = 500ms # Time between Bulk API status checks
+    --timeout: duration = 24hr        # Max wait time for the bulk job
+] {
+    let input = $in
+
+    if ($input == null) or ($input | is-empty) {
+        error make {msg: "No records piped in. Pipe a table with at least an Id column (e.g. from `sf query` or `sf bulk query`)."}
+    }
+
+    let sf = $env.SALESFORCE
+
+    let createable_fields = (
+        sf describe $object
+        | get fields
+        | where createable == true
+        | get name
+    )
+    let fields_str = ($createable_fields | str join ",")
+
+    let ids = ($input | get Id)
+    let source_records = (
+        $ids
+        | chunks 200
+        | each {|chunk|
+            let id_list = ($chunk | each {|id| $"'($id)'"} | str join ",")
+            let soql = $"SELECT ($fields_str) FROM ($object) WHERE Id IN \(($id_list)\)"
+            sf-call "GET" $"($sf.base_url)query/" --params {q: $soql}
+            | get records
+            | each {|r| $r | reject -o attributes}
+        }
+        | flatten
+    )
+
+    let final_records = if ($overrides != null) {
+        $source_records | each {|r| $r | merge $overrides}
+    } else {
+        $source_records
+    }
+
+    let csv_data = ($final_records | table-to-csv)
+    bulk-ingest $object "insert" $csv_data --poll-interval $poll_interval --timeout $timeout
+}
 
 # Insert records into Salesforce using the Bulk API 2.0.
 #
