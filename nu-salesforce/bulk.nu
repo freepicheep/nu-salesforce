@@ -120,7 +120,7 @@ def bulk-create-ingest-job [
     operation: string
     --external-id-field: string
 ] {
-    let url = (bulk-url)
+    let url = bulk-url
 
     let payload = {
         object: $object
@@ -150,7 +150,7 @@ def bulk-upload-data [
 
 # Signal that all data has been uploaded (set state to UploadComplete).
 def bulk-close-job [job_id: string] {
-    let url = (bulk-url --job-id $job_id)
+    let url = bulk-url --job-id $job_id
     let payload = {state: "UploadComplete"} | to json
     bulk-call "PATCH" $url --data $payload
 }
@@ -176,7 +176,7 @@ def bulk-wait-for-job [
     --poll-interval: duration = 500ms # Time between status checks
     --timeout: duration = 24hr # Max wait time before giving up
 ] {
-    let start = (date now)
+    let start = date now
     mut delay = $poll_interval
     mut job_info = null
 
@@ -216,7 +216,7 @@ def bulk-wait-for-job [
 
         # Exponential backoff up to 2 seconds
         let next_delay_ns = ($delay | into int) + ([1 ($delay | into int)] | math max)
-        let max_ns = (2sec | into int)
+        let max_ns = 2sec | into int
         $delay = if $next_delay_ns > $max_ns {
             2sec
         } else {
@@ -242,7 +242,7 @@ def bulk-ingest [
     --timeout: duration = 24hr
 ] {
     # 1. Create the job
-    let job = (bulk-create-ingest-job $object $operation --external-id-field $external_id_field)
+    let job = bulk-create-ingest-job $object $operation --external-id-field $external_id_field
     let job_id = $job.id
 
     if $job.state != "Open" {
@@ -257,7 +257,7 @@ def bulk-ingest [
         bulk-close-job $job_id
 
         # 4. Wait for processing to complete
-        let result = (bulk-wait-for-job $job_id --poll-interval $poll_interval --timeout $timeout)
+        let result = bulk-wait-for-job $job_id --poll-interval $poll_interval --timeout $timeout
 
         # 5. Return a summary
         {
@@ -277,7 +277,7 @@ def bulk-ingest [
 
 # Abort an ingest job.
 def bulk-abort-ingest-job [job_id: string] {
-    let url = (bulk-url --job-id $job_id)
+    let url = bulk-url --job-id $job_id
     let payload = {state: "Aborted"} | to json
     bulk-call "PATCH" $url --data $payload
 }
@@ -290,10 +290,28 @@ def bulk-abort-ingest-job [job_id: string] {
 # Returns a summary with the job ID and record counts.
 @example "insert accounts from a table" {
     [{Name: "Acme" Industry: "Tech"} {Name: "Globex" Industry: "Manufacturing"}] | sf bulk insert Account
-}
+} --result "
+╭───────────────────┬────────────────────╮
+│ job_id            │ 750Ox00000kmvJFIAY │
+│ state             │ JobComplete        │
+│ operation         │ insert             │
+│ object            │ Account            │
+│ records_processed │ 2                  │
+│ records_failed    │ 0                  │
+╰───────────────────┴────────────────────╯
+"
 @example "insert from a CSV file" {
     sf bulk insert Account --file accounts.csv
-}
+} --result "
+╭───────────────────┬────────────────────╮
+│ job_id            │ 750Ox00000kmvJFIAY │
+│ state             │ JobComplete        │
+│ operation         │ insert             │
+│ object            │ Account            │
+│ records_processed │ 2923               │
+│ records_failed    │ 0                  │
+╰───────────────────┴────────────────────╯
+"
 export def "sf bulk insert" [
     object: string # SObject type (e.g. Account, Lead)
     --file: path # Path to a CSV file to upload
@@ -345,7 +363,16 @@ export def "sf bulk update" [
 # otherwise a new record is created.
 @example "upsert accounts by external ID" {
     [{My_External_Id__c: "EXT-001" Name: "Acme"}] | sf bulk upsert Account --external-id-field My_External_Id__c
-}
+} --result "
+╭───────────────────┬────────────────────╮
+│ job_id            │ 750Ox00000kmvJJECN │
+│ state             │ JobComplete        │
+│ operation         │ upsert             │
+│ object            │ Account            │
+│ records_processed │ 1                  │
+│ records_failed    │ 0                  │
+╰───────────────────┴────────────────────╯
+"
 export def "sf bulk upsert" [
     object: string # SObject type (e.g. Account, Lead)
     --external-id-field: string = "Id" # The external ID field name
@@ -370,10 +397,28 @@ export def "sf bulk upsert" [
 # The input data must contain only the Id field.
 @example "delete accounts by ID" {
     [{Id: "001XX0000003DHP"} {Id: "001XX0000003DHQ"}] | sf bulk delete Account
-}
+} --result "
+╭───────────────────┬────────────────────╮
+│ job_id            │ 830Ox00000ckvKCJEK │
+│ state             │ JobComplete        │
+│ operation         │ delete             │
+│ object            │ Account            │
+│ records_processed │ 2                  │
+│ records_failed    │ 0                  │
+╰───────────────────┴────────────────────╯
+"
 @example "delete from a CSV file" {
     sf bulk delete Account --file deletes.csv
-}
+} --result "
+╭───────────────────┬────────────────────╮
+│ job_id            │ 2938x00000cdvCJDKC │
+│ state             │ JobComplete        │
+│ operation         │ delete             │
+│ object            │ Account            │
+│ records_processed │ 2923               │
+│ records_failed    │ 0                  │
+╰───────────────────┴────────────────────╯
+"
 export def "sf bulk delete" [
     object: string # SObject type (e.g. Account, Lead)
     --file: path # Path to a CSV file (must contain only Id column)
@@ -439,14 +484,14 @@ export def "sf bulk query" [
     let operation = if $include_deleted { "queryAll" } else { "query" }
 
     # 1. Create the query job
-    let url = (bulk-url --query)
+    let url = bulk-url --query
     let payload = {
         operation: $operation
         query: $soql
         columnDelimiter: "COMMA"
         lineEnding: "LF"
     }
-    let job = (bulk-call "POST" $url --data ($payload | to json))
+    let job = bulk-call "POST" $url --data ($payload | to json)
     let job_id = $job.id
 
     # 2. Wait for the query to complete
@@ -476,7 +521,17 @@ export def "sf bulk query" [
         )
 
         if $response.status >= 300 {
-            let detail = ($response.body | describe | if $in == "string" { $response.body } else { try { $response.body | to json } catch { $"($response.body)" } })
+            let detail = $response.body
+                | describe
+                | if $in == "string" {
+                    $response.body
+                } else {
+                    try {
+                        $response.body | to json
+                    } catch {
+                        $"($response.body)"
+                    }
+                }
             error make {msg: $"Bulk query results error \(($response.status)\): ($detail)"}
         }
 
@@ -484,19 +539,17 @@ export def "sf bulk query" [
 
         # Parse the CSV into a table and append
         if (not ($csv_text | str trim | is-empty)) {
-            let page_records = ($csv_text | from csv --flexible)
-            $all_records = ($all_records | append $page_records)
+            let page_records = $csv_text | from csv --flexible
+            $all_records = $all_records | append $page_records
         }
 
         # Check for next page via Sforce-Locator header
-        let next_locator = (
-            $response.headers
+        let next_locator = $response.headers
             | default []
             | transpose name value
             | where name == "sforce-locator"
             | get -o 0.value
             | default ""
-        )
 
         if ($next_locator | is-empty) or $next_locator == "null" {
             $has_more = false
@@ -544,11 +597,12 @@ export def "sf bulk status" [
 #
 # Returns a table with sf__Id, sf__Created, and the original data fields.
 @example "get successful records from an ingest job" {
-    sf bulk results 7501T00000Abc123
+    let result = sf bulk insert Account --file accounts.csv
+    let created_accounts = sf bulk results $result.job_id
 }
 export def "sf bulk results" [
     job_id: string # The job ID
-] {
+]: string -> table {
     let sf = $env.SALESFORCE
     let url = $"(bulk-url --job-id $job_id)/successfulResults"
     let response = (
@@ -577,11 +631,12 @@ export def "sf bulk results" [
 #
 # Returns a table with sf__Id, sf__Error, and the original data fields.
 @example "get failed records from an ingest job" {
-    sf bulk failures 7501T00000Abc123
+    let result = sf bulk insert Account --file accounts.csv
+    let failed_accounts = sf bulk failures $result.job_id
 }
 export def "sf bulk failures" [
     job_id: string # The job ID
-] {
+]: string -> table {
     let sf = $env.SALESFORCE
     let url = $"(bulk-url --job-id $job_id)/failedResults"
     let response = (
@@ -656,7 +711,7 @@ export def "sf bulk abort" [
         bulk-url --job-id $job_id
     }
     let payload = {state: "Aborted"} | to json
-    let result = (bulk-call "PATCH" $url --data $payload)
+    let result = bulk-call "PATCH" $url --data $payload
     {
         id: $job_id
         state: "Aborted"
@@ -700,6 +755,6 @@ export def "sf bulk list-jobs" [
     } else {
         bulk-url
     }
-    let result = (bulk-call "GET" $url)
+    let result = bulk-call "GET" $url
     $result.records? | default []
 }
