@@ -1,7 +1,7 @@
 {
     package: {
         name: nu-salesforce
-        version: "0.3.2"
+        version: "0.3.3"
         description: "Query and update your Salesforce data with Nu"
         license: MIT
         authors: ["Friedrich Stoltzfus"]
