@@ -602,7 +602,7 @@ export def "sf bulk status" [
 }
 export def "sf bulk results" [
     job_id: string # The job ID
-]: string -> table {
+] {
     let sf = $env.SALESFORCE
     let url = $"(bulk-url --job-id $job_id)/successfulResults"
     let response = (
@@ -636,7 +636,7 @@ export def "sf bulk results" [
 }
 export def "sf bulk failures" [
     job_id: string # The job ID
-]: string -> table {
+] {
     let sf = $env.SALESFORCE
     let url = $"(bulk-url --job-id $job_id)/failedResults"
     let response = (
