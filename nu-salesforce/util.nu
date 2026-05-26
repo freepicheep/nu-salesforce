@@ -239,6 +239,7 @@ export def --env load-env-file [path?: path = '.env'] {
 # Parses `KEY=value` text into a record
 export def 'from kv' []: oneof<string, nothing> -> record {
     default ''
+    | lines
     | parse '{key}={value}'
     | update value { from yaml }
     | transpose -dlr
