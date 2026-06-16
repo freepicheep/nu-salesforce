@@ -4,7 +4,7 @@
 #   use nu-salesforce *
 #
 #   # Authenticate (OAuth 2.0 via an External Client App)
-#   sf login --device --client-id $env.CLIENT_ID --client-secret $env.CLIENT_SECRET
+#   sf login --client-id "<consumer-key>" --client-secret "<consumer-secret>" --instance "mydomain.my.salesforce.com"
 #
 #   # Query
 #   sf query "SELECT Id, Name FROM Account LIMIT 10"
