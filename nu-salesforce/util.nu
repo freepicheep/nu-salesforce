@@ -9,6 +9,8 @@ export def build-session [
     --version: string = "64.0"
     --domain: string = "login"
     --auth-type: string = "direct"
+    --refresh-token: any # OAuth refresh token, if the flow returned one
+    --issued-at: any # Token issue time (epoch millis string), if known
 ] {
     let base_url = $"https://($instance)/services/data/v($version)/"
     {
@@ -22,6 +24,8 @@ export def build-session [
         tooling_url: $"($base_url)tooling/"
         oauth2_url: $"https://($instance)/services/oauth2/"
         bulk_url: $"https://($instance)/services/async/($version)/"
+        refresh_token: $refresh_token
+        issued_at: $issued_at
         headers: (build-headers $session_id)
     }
 }
@@ -122,6 +126,109 @@ export def sf-error [status: int url: string content: any] {
     }
 
     error make {msg: $"($msg)\nURL: ($url)\nResponse: ($detail)"}
+}
+
+# ── OAuth 2.0 helpers ──────────────────────────────────────────────────────
+
+# Encode a string or binary value as URL-safe, unpadded Base64 (RFC 7515) —
+# the encoding required for JSON Web Token segments.
+export def b64url []: any -> string {
+    encode base64 --url --nopad
+}
+
+# Extract the instance host (e.g. mydomain.my.salesforce.com) from a URL such
+# as an OAuth `instance_url` or a SOAP serverUrl.
+export def host-from-url [url: string] {
+    $url
+    | str replace "https://" ""
+    | str replace "http://" ""
+    | split row "/"
+    | first
+    | str replace "-api" ""
+}
+
+# Resolve the OAuth login host used for the JWT `aud` claim and as the token
+# endpoint host for the JWT and Device flows.
+#   - If an explicit instance (My Domain) is given, use it.
+#   - Otherwise fall back to test/login.salesforce.com based on the domain.
+export def login-host [domain: string instance?: string] {
+    if ($instance != null and $instance != "") {
+        $instance
+    } else if ($domain == "test") {
+        "test.salesforce.com"
+    } else {
+        "login.salesforce.com"
+    }
+}
+
+# POST form-urlencoded parameters to a Salesforce OAuth token endpoint.
+# Returns the full response as { status, body } without raising on errors,
+# so callers (e.g. Device flow polling) can inspect expected error codes.
+# `http post` form-encodes the record itself when given this content type.
+export def oauth-post [token_url: string params: record] {
+    let form = (
+        $params
+        | transpose key value
+        | where value != null
+        | reduce --fold {} {|it acc| $acc | upsert $it.key $it.value }
+    )
+    let response = (
+        http post $token_url $form
+        --content-type "application/x-www-form-urlencoded"
+        --full
+        --allow-errors
+    )
+    {status: $response.status body: $response.body}
+}
+
+# Request an OAuth access token, raising a structured error on failure.
+# Used by the Client Credentials and JWT Bearer flows.
+export def sf-oauth-token [token_url: string params: record] {
+    let response = (oauth-post $token_url $params)
+    if $response.status >= 300 {
+        sf-oauth-error $response.status $token_url $response.body
+    }
+    $response.body
+}
+
+# Raise a structured error from a Salesforce OAuth token error response.
+# The body is JSON like { error, error_description }, which `http post` may
+# already have parsed into a record.
+export def sf-oauth-error [status: int url: string content: any] {
+    let body = if (($content | describe) == "string") {
+        try { $content | from json } catch { {} }
+    } else {
+        $content
+    }
+    let err = ($body.error? | default $"HTTP ($status)")
+    let desc = ($body.error_description? | default "")
+    let detail = if ($desc == "") { $err } else { $"($err): ($desc)" }
+    error make {msg: $"Salesforce OAuth error \(($status)\): ($detail)\nEndpoint: ($url)"}
+}
+
+# Build and RS256-sign a JWT assertion for the OAuth 2.0 JWT Bearer flow.
+#   iss = consumer key (client id), sub = username to impersonate,
+#   aud = login host URL, exp = now + 3 minutes.
+# Signs `header.claims` with the RSA private key at key_path via openssl.
+export def build-jwt-assertion [
+    client_id: string
+    username: string
+    audience: string
+    key_path: path
+] {
+    if (not ($key_path | path exists)) {
+        error make {msg: $"JWT private key not found: ($key_path)"}
+    }
+    let header = ({alg: "RS256" typ: "JWT"} | to json --raw | b64url)
+    let exp = ((date now | format date "%s" | into int) + 180)
+    let claims = (
+        {iss: $client_id sub: $username aud: $audience exp: $exp}
+        | to json --raw
+        | b64url
+    )
+    let signing_input = $"($header).($claims)"
+    let signature = ($signing_input | openssl dgst -sha256 -sign $key_path | b64url)
+    $"($signing_input).($signature)"
 }
 
 # Validate a SOQL query string for common structural issues.

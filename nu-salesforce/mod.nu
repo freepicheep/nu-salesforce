@@ -3,8 +3,8 @@
 # Usage:
 #   use nu-salesforce *
 #
-#   # Authenticate
-#   sf login --username user@example.com --password secret --token XXXXX
+#   # Authenticate (OAuth 2.0 via an External Client App)
+#   sf login --device --client-id $env.CLIENT_ID --client-secret $env.CLIENT_SECRET
 #
 #   # Query
 #   sf query "SELECT Id, Name FROM Account LIMIT 10"
