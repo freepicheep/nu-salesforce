@@ -62,7 +62,7 @@ def bulk-call [
         X-PrettyPrint: "1"
     }
 
-    let response = match ($method | str upcase) {
+    let response = match ($method | str uppercase) {
         "GET" => {
             http get $url --headers $headers --full --allow-errors
         }

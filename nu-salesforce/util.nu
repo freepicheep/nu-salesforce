@@ -52,7 +52,7 @@ export def sf-call [
     let sf = $env.SALESFORCE
     let headers = $sf.headers
 
-    let response = match ($method | str upcase) {
+    let response = match ($method | str uppercase) {
         "GET" => {
             if ($params != null) {
                 # Build query string manually
@@ -236,7 +236,7 @@ export def build-jwt-assertion [
 # Call this before sending a SOQL query to the Salesforce API.
 export def validate-soql [soql: string] {
     let trimmed = ($soql | str trim)
-    let upper = ($trimmed | str upcase)
+    let upper = ($trimmed | str uppercase)
     mut errors = []
 
     # Must start with SELECT
