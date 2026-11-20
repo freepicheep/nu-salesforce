@@ -335,6 +335,13 @@ export def format-query-records [records: any include_attributes: bool] {
 }
 
 # Loads environment variables from a file
+#
+# Deprecated: Nushell 0.117 added the built-in `from dotenv`. Use
+# `open .env | load-env` (or `open --raw <path> | from dotenv | load-env` for
+# files not named like `.env`) instead. Note that `from dotenv` expands `$NAME`
+# in unquoted and double-quoted values, so single-quote values containing `$`.
+@deprecated "Use the built-in `open .env | load-env` (or `open --raw <path> | from dotenv | load-env`) instead. Single-quote values containing `$`." --since "0.4.2" --remove "0.5.0"
+@category deprecated
 export def --env load-env-file [path?: path = '.env'] {
     if ($path | path exists) {
         open -r $path | from kv | load-env
@@ -343,7 +350,8 @@ export def --env load-env-file [path?: path = '.env'] {
     }
 }
 
-# Parses `KEY=value` text into a record
+# Parses `KEY=value` text into a record.
+# Internal helper for the deprecated `load-env-file`; remove alongside it.
 export def 'from kv' []: oneof<string, nothing> -> record {
     default ''
     | lines

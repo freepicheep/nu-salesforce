@@ -178,13 +178,12 @@ def bulk-wait-for-job [
 ] {
     let start = date now
     mut delay = $poll_interval
-    mut job_info = null
 
     # Initial sleep before first poll
     sleep $poll_interval
 
     loop {
-        $job_info = if $query {
+        let job_info = if $query {
             bulk-get-job $job_id --query
         } else {
             bulk-get-job $job_id
@@ -543,10 +542,10 @@ export def "sf bulk query" [
             $all_records = $all_records | append $page_records
         }
 
-        # Check for next page via Sforce-Locator header
-        let next_locator = $response.headers
+        # Check for next page via Sforce-Locator header.
+        # `--full` returns headers as {request: table, response: table<name, value>}.
+        let next_locator = $response.headers.response?
             | default []
-            | transpose name value
             | where name == "sforce-locator"
             | get -o 0.value
             | default ""

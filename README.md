@@ -137,7 +137,7 @@ sf login --session-id "<session-id>" --instance "mydomain.my.salesforce.com"
 
 ### SOAP username/password (deprecated)
 
-Still supported until the June 2027 retirement; `sf login` prints a deprecation warning. You can keep credentials in a `.env` file and load them with `load-env-file`.[^1]
+Still supported until the June 2027 retirement; `sf login` prints a deprecation warning. You can keep credentials in a `.env` file and load them with Nushell's built-in `from dotenv` and `load-env`.
 
 **Your `.env` File**
 ```env
@@ -146,8 +146,10 @@ SALESFORCE_PASSWORD='xxxxxxxx'
 SECURITY_TOKEN='xxxxxxxx'
 ```
 
+> **Tip:** `from dotenv` expands `$NAME` in unquoted and double-quoted values, so wrap passwords and tokens in single quotes as shown above.
+
 ```nu
-load-env-file
+open .env | load-env   # or: open --raw creds.txt | from dotenv | load-env
 sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD --token $env.SECURITY_TOKEN
 ```
 
@@ -177,7 +179,7 @@ sf login --username $env.SALESFORCE_USERNAME --password $env.SALESFORCE_PASSWORD
 | `sf tooling` | Call the Tooling API |
 | `sf limits` | Show org API usage limits |
 | `sf describe-all` | Describe all available SObjects |
-| `load-env-file` | Loads key-value data from a .env file |
+| `load-env-file` | **Deprecated** — use `open .env \| load-env` instead. Will be removed in 0.5.0[^1] |
 
 `sf query` and `sf query-more` remove Salesforce `attributes` records from returned records by default for cleaner Nushell tables. Use `--include-attributes` to keep that metadata, or `--raw` to inspect the full API response.
 
